@@ -1,0 +1,107 @@
+service: sample-serverless-app
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: ap-northeast-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource: "*"
+  environment:
+    TABLE_NAME: {"Ref": "MyPostsTable"}
+    ALLOW_ORIGIN: "*"
+
+package:
+  exclude:
+    - node_modules/**
+    - static_website/**
+    - package-lock.json
+    - package.json
+
+functions:
+  create:
+    handler: lambdas/CreateRecord.handler
+    events:
+      - http:
+          path: posts
+          method: post
+          cors: true
+  delete:
+    handler: lambdas/DeleteRecord.handler
+    events:
+      - http:
+          path: posts/{PostId}
+          method: delete
+          cors: true
+  list:
+    handler: lambdas/ListRecords.handler
+    events:
+      - http:
+          path: posts
+          method: get
+          cors: true
+  read:
+    handler: lambdas/ReadRecord.handler
+    events:
+      - http:
+          path: posts/{PostId}
+          method: get
+          cors: true
+  update:
+    handler: lambdas/UpdateRecord.handler
+    events:
+      - http:
+          path: posts/{PostId}
+          method: put
+          cors: true
+
+resources:
+  Resources:
+    MyPostsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: PostId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: PostId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        Tags: 
+          - Key: memo
+            Value: "created by serverless framework"
+    StaticWebsite:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: PolicyForStaticWebsite
+          Version: '2012-10-17'
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: !Join 
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref StaticWebsite
+                  - /*
+        Bucket: !Ref StaticWebsite
+  Outputs:
+     Website:
+       Description: "now created serverless web application"
+       Value: {"Fn::GetAtt": ["StaticWebsite", "WebsiteURL"]}
+     S3Bucket:
+       Description: "S3 bucket in which static website is hosted"
+       Value: {"Ref": "StaticWebsite"}
+

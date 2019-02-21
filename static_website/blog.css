@@ -1,0 +1,8 @@
+#divPosts table {
+    border: solid 1px black;
+    border-collapse: collapse;
+}
+
+#divPosts table td {
+    border: solid 1px black;
+}

@@ -1,0 +1,16 @@
+{
+  "name": "serverless-sample-webapp",
+  "version": "1.0.0",
+  "description": "sample serverless application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "serverless deploy -v",
+    "remove": "serverless remove -v"
+  },
+  "author": "Wataru Nishi",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^1.38.0"
+  }
+}
