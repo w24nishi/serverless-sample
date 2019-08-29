@@ -11,6 +11,6 @@
   "author": "Wataru Nishi",
   "license": "MIT",
   "devDependencies": {
-    "serverless": "^1.38.0"
+    "serverless": "^1.51.0"
   }
 }
